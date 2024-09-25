@@ -1,4 +1,4 @@
-pipeline {
+ppipeline {
     agent any
     stages {
         stage('Build') {
@@ -10,8 +10,8 @@ pipeline {
             steps {
                 echo 'Running unit tests...'
                 script {
-                    // Run the Python tests using sh for macOS/Unix systems
-                    def result = sh(returnStatus: true, script: 'python3 -m unittest test_app.py')
+                    // Use bash instead of sh for running commands
+                    def result = bash(returnStatus: true, script: 'python3 -m unittest test_app.py')
                     if (result != 0) {
                         error "Unit tests failed"
                     }
@@ -22,8 +22,8 @@ pipeline {
             steps {
                 echo 'Deploying the Python app...'
                 script {
-                    // Run the Python app using sh for macOS/Unix systems
-                    def result = sh(returnStatus: true, script: 'python3 app.py')
+                    // Use bash instead of sh for deployment
+                    def result = bash(returnStatus: true, script: 'python3 app.py')
                     if (result != 0) {
                         error "Deployment failed"
                     }
