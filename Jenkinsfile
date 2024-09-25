@@ -10,20 +10,12 @@ pipeline {
             steps {
                 echo 'Running unit tests...'
                 script {
-                    if (isUnix()) {
-                        // On Unix/macOS systems, execute Python test directly
-                        echo "Running: python3 -m unittest test_app.py"
-                        def result = sh(returnStatus: true, script: 'python3 -m unittest test_app.py')
-                        if (result != 0) {
-                            error "Unit tests failed"
-                        }
-                    } else {
-                        // On Windows systems, use bat to run Python tests
-                        echo "Running: python -m unittest test_app.py"
-                        def result = bat(returnStatus: true, script: 'python -m unittest test_app.py')
-                        if (result != 0) {
-                            error "Unit tests failed"
-                        }
+                    // Run python3 for unit tests directly
+                    def result = 'python3 -m unittest test_app.py'.execute()
+                    result.waitFor()
+                    echo result.text
+                    if (result.exitValue() != 0) {
+                        error "Unit tests failed"
                     }
                 }
             }
@@ -32,14 +24,12 @@ pipeline {
             steps {
                 echo 'Deploying the Python app...'
                 script {
-                    if (isUnix()) {
-                        // On Unix/macOS systems, execute the Python app directly
-                        echo "Running: python3 app.py"
-                        sh 'python3 app.py'
-                    } else {
-                        // On Windows systems, use bat to run the Python app
-                        echo "Running: python app.py"
-                        bat 'python app.py'
+                    // Run python3 for the app directly
+                    def result = 'python3 app.py'.execute()
+                    result.waitFor()
+                    echo result.text
+                    if (result.exitValue() != 0) {
+                        error "Deployment failed"
                     }
                 }
             }
