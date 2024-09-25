@@ -10,11 +10,9 @@ pipeline {
             steps {
                 echo 'Running unit tests...'
                 script {
-                    // Run python3 for unit tests directly
-                    def result = 'python3 -m unittest test_app.py'.execute()
-                    result.waitFor()
-                    echo result.text
-                    if (result.exitValue() != 0) {
+                    // Run the Python tests using sh for macOS/Unix systems
+                    def result = sh(returnStatus: true, script: 'python3 -m unittest test_app.py')
+                    if (result != 0) {
                         error "Unit tests failed"
                     }
                 }
@@ -24,11 +22,9 @@ pipeline {
             steps {
                 echo 'Deploying the Python app...'
                 script {
-                    // Run python3 for the app directly
-                    def result = 'python3 app.py'.execute()
-                    result.waitFor()
-                    echo result.text
-                    if (result.exitValue() != 0) {
+                    // Run the Python app using sh for macOS/Unix systems
+                    def result = sh(returnStatus: true, script: 'python3 app.py')
+                    if (result != 0) {
                         error "Deployment failed"
                     }
                 }
