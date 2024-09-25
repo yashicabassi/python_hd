@@ -9,13 +9,24 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running unit tests...'
-                // Use python3 directly instead of sh
+                // Run the Python unittest without using 'sh'
                 script {
-                    def pythonTestCommand = 'python3 -m unittest test_app.py'
                     if (isUnix()) {
-                        sh pythonTestCommand
+                        // On Unix/macOS systems, use python3 directly
+                        def pythonCommand = "python3 -m unittest test_app.py"
+                        echo "Running: ${pythonCommand}"
+                        def result = sh(script: pythonCommand, returnStatus: true)
+                        if (result != 0) {
+                            error "Unit tests failed"
+                        }
                     } else {
-                        bat pythonTestCommand
+                        // On Windows systems, use bat to run Python
+                        def pythonCommand = "python -m unittest test_app.py"
+                        echo "Running: ${pythonCommand}"
+                        def result = bat(script: pythonCommand, returnStatus: true)
+                        if (result != 0) {
+                            error "Unit tests failed"
+                        }
                     }
                 }
             }
@@ -23,13 +34,18 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying the Python app...'
-                // Use python3 directly instead of sh
+                // Run the Python app directly without using 'sh'
                 script {
-                    def pythonDeployCommand = 'python3 app.py'
                     if (isUnix()) {
-                        sh pythonDeployCommand
+                        // On Unix/macOS systems, use python3 directly
+                        def pythonCommand = "python3 app.py"
+                        echo "Running: ${pythonCommand}"
+                        sh pythonCommand
                     } else {
-                        bat pythonDeployCommand
+                        // On Windows systems, use bat to run Python
+                        def pythonCommand = "python app.py"
+                        echo "Running: ${pythonCommand}"
+                        bat pythonCommand
                     }
                 }
             }
