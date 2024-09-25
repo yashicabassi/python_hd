@@ -10,10 +10,16 @@ pipeline {
             steps {
                 echo 'Running unit tests...'
                 script {
-                    // Use bash instead of sh for running commands
-                    def result = bash(returnStatus: true, script: 'python3 -m unittest test_app.py')
-                    if (result != 0) {
-                        error "Unit tests failed"
+                    // Directly run the Python command using Groovy's execute method
+                    def testProcess = "python3 -m unittest test_app.py".execute()
+                    testProcess.waitFor()
+                    def output = testProcess.in.text
+                    def errorOutput = testProcess.err.text
+
+                    // Print output and error
+                    echo output
+                    if (errorOutput) {
+                        error "Unit tests failed: ${errorOutput}"
                     }
                 }
             }
@@ -22,10 +28,16 @@ pipeline {
             steps {
                 echo 'Deploying the Python app...'
                 script {
-                    // Use bash instead of sh for deployment
-                    def result = bash(returnStatus: true, script: 'python3 app.py')
-                    if (result != 0) {
-                        error "Deployment failed"
+                    // Directly run the Python deployment command using Groovy's execute method
+                    def deployProcess = "python3 app.py".execute()
+                    deployProcess.waitFor()
+                    def output = deployProcess.in.text
+                    def errorOutput = deployProcess.err.text
+
+                    // Print output and error
+                    echo output
+                    if (errorOutput) {
+                        error "Deployment failed: ${errorOutput}"
                     }
                 }
             }
