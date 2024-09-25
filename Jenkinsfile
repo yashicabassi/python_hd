@@ -9,13 +9,29 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running unit tests...'
-                sh 'python3 -m unittest test_app.py'
+                // Use python3 directly instead of sh
+                script {
+                    def pythonTestCommand = 'python3 -m unittest test_app.py'
+                    if (isUnix()) {
+                        sh pythonTestCommand
+                    } else {
+                        bat pythonTestCommand
+                    }
+                }
             }
         }
         stage('Deploy') {
             steps {
                 echo 'Deploying the Python app...'
-                sh 'python3 app.py'
+                // Use python3 directly instead of sh
+                script {
+                    def pythonDeployCommand = 'python3 app.py'
+                    if (isUnix()) {
+                        sh pythonDeployCommand
+                    } else {
+                        bat pythonDeployCommand
+                    }
+                }
             }
         }
     }
