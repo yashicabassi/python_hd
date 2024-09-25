@@ -9,21 +9,18 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running unit tests...'
-                // Run the Python unittest without using 'sh'
                 script {
                     if (isUnix()) {
-                        // On Unix/macOS systems, use python3 directly
-                        def pythonCommand = "python3 -m unittest test_app.py"
-                        echo "Running: ${pythonCommand}"
-                        def result = sh(script: pythonCommand, returnStatus: true)
+                        // On Unix/macOS systems, execute Python test directly
+                        echo "Running: python3 -m unittest test_app.py"
+                        def result = sh(returnStatus: true, script: 'python3 -m unittest test_app.py')
                         if (result != 0) {
                             error "Unit tests failed"
                         }
                     } else {
-                        // On Windows systems, use bat to run Python
-                        def pythonCommand = "python -m unittest test_app.py"
-                        echo "Running: ${pythonCommand}"
-                        def result = bat(script: pythonCommand, returnStatus: true)
+                        // On Windows systems, use bat to run Python tests
+                        echo "Running: python -m unittest test_app.py"
+                        def result = bat(returnStatus: true, script: 'python -m unittest test_app.py')
                         if (result != 0) {
                             error "Unit tests failed"
                         }
@@ -34,18 +31,15 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying the Python app...'
-                // Run the Python app directly without using 'sh'
                 script {
                     if (isUnix()) {
-                        // On Unix/macOS systems, use python3 directly
-                        def pythonCommand = "python3 app.py"
-                        echo "Running: ${pythonCommand}"
-                        sh pythonCommand
+                        // On Unix/macOS systems, execute the Python app directly
+                        echo "Running: python3 app.py"
+                        sh 'python3 app.py'
                     } else {
-                        // On Windows systems, use bat to run Python
-                        def pythonCommand = "python app.py"
-                        echo "Running: ${pythonCommand}"
-                        bat pythonCommand
+                        // On Windows systems, use bat to run the Python app
+                        echo "Running: python app.py"
+                        bat 'python app.py'
                     }
                 }
             }
