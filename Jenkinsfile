@@ -1,6 +1,17 @@
 pipeline {
     agent any
     stages {
+        stage('Debug Shell') {
+            steps {
+                echo 'Checking shell environment...'
+                script {
+                    // Print the current shell being used and verify bash/sh availability
+                    sh 'echo "Shell in use: $SHELL"'
+                    sh 'which bash'
+                    sh 'which sh'
+                }
+            }
+        }
         stage('Build') {
             steps {
                 echo 'Building the Python app...'
@@ -10,16 +21,9 @@ pipeline {
             steps {
                 echo 'Running unit tests...'
                 script {
-                    // Directly run the Python command using Groovy's execute method
-                    def testProcess = "python3 -m unittest test_app.py".execute()
-                    testProcess.waitFor()
-                    def output = testProcess.in.text
-                    def errorOutput = testProcess.err.text
-
-                    // Print output and error
-                    echo output
-                    if (errorOutput) {
-                        error "Unit tests failed: ${errorOutput}"
+                    def result = sh(returnStatus: true, script: 'python3 -m unittest test_app.py')
+                    if (result != 0) {
+                        error "Unit tests failed"
                     }
                 }
             }
@@ -28,16 +32,9 @@ pipeline {
             steps {
                 echo 'Deploying the Python app...'
                 script {
-                    // Directly run the Python deployment command using Groovy's execute method
-                    def deployProcess = "python3 app.py".execute()
-                    deployProcess.waitFor()
-                    def output = deployProcess.in.text
-                    def errorOutput = deployProcess.err.text
-
-                    // Print output and error
-                    echo output
-                    if (errorOutput) {
-                        error "Deployment failed: ${errorOutput}"
+                    def result = sh(returnStatus: true, script: 'python3 app.py')
+                    if (result != 0) {
+                        error "Deployment failed"
                     }
                 }
             }
